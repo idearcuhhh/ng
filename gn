@@ -82,11 +82,11 @@ local function createButton(name, position, callback)
     return button
 end
 
--- Create 4 buttons
-local button1 = createButton("Button 1", UDim2.new(0.05, 0, 0.4, 0), function() print("Button 1 clicked!") end)
-local button2 = createButton("Button 2", UDim2.new(0.5, 0, 0.4, 0), function() print("Button 2 clicked!") end)
-local button3 = createButton("Button 3", UDim2.new(0.05, 0, 0.65, 0), function() print("Button 3 clicked!") end)
-local button4 = createButton("Button 4", UDim2.new(0.5, 0, 0.65, 0), function() print("Button 4 clicked!") end)
+-- Adjusted Button Positions (Moved Up)
+local button1 = createButton("Button 1", UDim2.new(0.05, 0, 0.3, 0), function() print("Button 1 clicked!") end)
+local button2 = createButton("Button 2", UDim2.new(0.5, 0, 0.3, 0), function() print("Button 2 clicked!") end)
+local button3 = createButton("Button 3", UDim2.new(0.05, 0, 0.55, 0), function() print("Button 3 clicked!") end)
+local button4 = createButton("Button 4", UDim2.new(0.5, 0, 0.55, 0), function() print("Button 4 clicked!") end)
 
 -- Minimize/Maximize Functionality
 local minimized = false
