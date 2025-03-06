@@ -1,0 +1,135 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:FindFirstChild("PlayerGui")
+
+if not playerGui then
+    repeat wait() until player:FindFirstChild("PlayerGui")
+    playerGui = player:FindFirstChild("PlayerGui")
+end
+
+-- Create the ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false -- Prevents it from disappearing on death
+screenGui.Parent = playerGui
+
+-- Create the Frame (GUI)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 250) -- Slightly bigger
+frame.Position = UDim2.new(0.5, -175, 0.5, -125) -- Centered
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Dark gray
+frame.BorderSizePixel = 2
+frame.Active = true -- Needed for dragging
+frame.Draggable = true -- Enables PC dragging
+frame.Parent = screenGui
+
+-- Add UI Corner for rounded edges
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = frame
+
+-- Title Label (Drag Bar)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = frame.BackgroundColor3 -- Matches frame
+title.Text = "Centered GUI"
+title.TextSize = 20
+title.Font = Enum.Font.SourceSansBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BorderSizePixel = 0
+title.Parent = frame
+
+-- Minimize/Maximize Button
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 30, 0, 30)
+toggleButton.Position = UDim2.new(1, -35, 0, 0) -- Top-right
+toggleButton.Text = "–"
+toggleButton.TextSize = 20
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Keep text white
+toggleButton.BackgroundColor3 = frame.BackgroundColor3 -- Same as GUI
+toggleButton.BorderSizePixel = 0
+toggleButton.Parent = frame
+
+-- UI Corner for Button
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 6)
+buttonCorner.Parent = toggleButton
+
+-- Minimize/Maximize Functionality
+local minimized = false
+
+toggleButton.MouseButton1Click:Connect(function()
+    if minimized then
+        frame:TweenSize(UDim2.new(0, 350, 0, 250), "Out", "Sine", 0.3, true)
+        toggleButton.Text = "–"
+    else
+        frame:TweenSize(UDim2.new(0, 350, 0, 30), "Out", "Sine", 0.3, true)
+        toggleButton.Text = "+"
+    end
+    minimized = not minimized
+end)
+
+-- Function to create buttons
+local function createButton(name, position, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.45, 0, 0.2, 0) -- Buttons are 45% width, 20% height
+    button.Position = position
+    button.BackgroundColor3 = Color3.fromRGB(70, 70, 70) -- Darker Gray
+    button.Text = name
+    button.TextSize = 18
+    button.Font = Enum.Font.SourceSansBold
+    button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+    button.Parent = frame
+
+    -- UI Corner for button styling
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = button
+
+    -- Click event
+    button.MouseButton1Click:Connect(callback)
+
+    return button
+end
+
+-- Create 4 buttons
+local button1 = createButton("Button 1", UDim2.new(0.05, 0, 0.4, 0), function() print("Button 1 clicked!") end)
+local button2 = createButton("Button 2", UDim2.new(0.5, 0, 0.4, 0), function() print("Button 2 clicked!") end)
+local button3 = createButton("Button 3", UDim2.new(0.05, 0, 0.65, 0), function() print("Button 3 clicked!") end)
+local button4 = createButton("Button 4", UDim2.new(0.5, 0, 0.65, 0), function() print("Button 4 clicked!") end)
+
+-- Mobile Dragging Support
+local userInputService = game:GetService("UserInputService")
+
+local dragging, dragInput, startPos, dragStart
+
+local function update(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
